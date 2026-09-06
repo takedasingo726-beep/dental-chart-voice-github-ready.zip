@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.wav
+*.mp3
+*.m4a
+!sample_audio/.gitkeep
+.env
+whisper_models/
+*.log
+output/
