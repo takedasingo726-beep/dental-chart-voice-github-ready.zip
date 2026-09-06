@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    dental-chart-voice｜カルテ下書き自動生成
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/static/style.css"
+  >
+</head>
+
+<body>
+
+<header class="masthead">
+  <h1>カルテ下書き自動生成</h1>
+
+  <span class="tag">
+    音声はローカル処理のみ・外部送信なし
+  </span>
+</header>
+
+<div class="layout">
+
+  <aside class="rail">
+
+    <ol class="steps" id="steps">
+
+      <li
+        class="active"
+        data-step="upload"
+      >
+        <h3>録音をアップロード</h3>
+
+        <p>
+          診察後の会話録音（wav/mp3/m4a等）を選択します
+        </p>
+      </li>
+
+      <li data-step="transcribe">
+
+        <h3>文字起こし</h3>
+
+        <p>
+          faster-whisperによりローカルで処理します
+        </p>
+
+      </li>
+
+      <li data-step="extract">
+
+        <h3>情報抽出</h3>
+
+        <p>
+          症状・服薬・アレルギー言及を辞書ベースで抽出します
+        </p>
+
+      </li>
+
+      <li data-step="review">
+
+        <h3>歯科医師が確認</h3>
+
+        <p>
+          内容を確認・修正してからカルテに反映してください
+        </p>
+
+      </li>
+
+    </ol>
+
+    <label
+      class="dropzone"
+      id="dropzone"
+    >
+
+      <input
+        type="file"
+        id="fileInput"
+        accept=".wav,.mp3,.m4a,.mp4,.webm,.ogg"
+      >
+
+      <span>
+        クリックまたはドラッグ＆ドロップで音声ファイルを選択
+      </span>
+
+      <span
+        class="filename"
+        id="filename"
+      ></span>
+
+    </label>
+
+    <button
+      class="run"
+      id="runButton"
+      disabled
+    >
+      解析する
+    </button>
+
+    <div
+      class="status-line"
+      id="statusLine"
+    ></div>
+
+  </aside>
+
+  <main class="chart">
+
+    <div class="review-banner">
+
+      <strong>要確認：</strong>
+
+      この下書きは自動抽出結果です。
+      内容の正確性を歯科医師が確認し、
+      必要に応じて修正した上で正式なカルテに反映してください。
+
+    </div>
+
+    <div
+      id="emptyState"
+      class="empty-state"
+    >
+
+      <h2>まだ結果がありません</h2>
+
+      <p>
+        左のパネルから録音ファイルをアップロードし、
+        「解析する」を押してください。
+        文字起こしと情報抽出はすべてこのサーバー内
+        （ローカル）で完結します。
+      </p>
+
+    </div>
+
+    <form
+      id="karteForm"
+      style="display:none;"
+    >
+
+      <div class="field">
+
+        <label for="chiefComplaint">
+          主訴（推定）
+        </label>
+
+        <textarea
+          id="chiefComplaint"
+          rows="2"
+        ></textarea>
+
+      </div>
+
+      <div class="field">
+
+        <label>症状</label>
+
+        <div
+          class="tag-list"
+          id="symptomsList"
+        ></div>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          現在服用中の薬（言及されたカテゴリ）
+        </label>
+
+        <div
+          class="tag-list"
+          id="medicationsList"
+        ></div>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          アレルギーに関する言及
+        </label>
+
+        <div
+          class="tag-list"
+          id="allergyList"
+        ></div>
+
+      </div>
+
+      <div class="field">
+
+        <label>
+          抽出時の補足メモ
+        </label>
+
+        <ul
+          class="notes-list"
+          id="notesList"
+        ></ul>
+
+      </div>
+
+      <div class="field">
+
+        <label for="freeNotes">
+          歯科医師による追記・修正
+        </label>
+
+        <textarea
+          id="freeNotes"
+          rows="4"
+          placeholder="自動抽出結果に対する修正・補足をここに記入してください"
+        ></textarea>
+
+      </div>
+
+      <details class="transcript">
+
+        <summary>
+          文字起こし全文を表示（原文）
+        </summary>
+
+        <pre id="rawTranscript"></pre>
+
+      </details>
+
+      <div class="actions">
+
+        <button
+          type="button"
+          class="primary"
+          id="downloadJson"
+        >
+          JSONでダウンロード
+        </button>
+
+        <button
+          type="button"
+          id="resetForm"
+        >
+          クリアして最初から
+        </button>
+
+      </div>
+
+    </form>
+
+  </main>
+
+</div>
+
+<script src="/static/app.js"></script>
+
+</body>
+
+</html>
